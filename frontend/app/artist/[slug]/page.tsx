@@ -164,7 +164,7 @@ export async function generateMetadata({
   }
   if (!data) return {};
   const { canonical } = data;
-  const title = truncateTitle(`${canonical} — Vinyl Deals & Price History | Vinyl Tracker`);
+  const title = truncateTitle(`${canonical} — Vinyl Deals & Price History | The Groove Hunter`);
   const description = truncateDesc(`Best vinyl deals for ${canonical}: track price history and find the right record at the lowest price.`);
   return {
     title,

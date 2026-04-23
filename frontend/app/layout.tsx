@@ -19,7 +19,7 @@ const dmSans = DM_Sans({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-const DEFAULT_TITLE = "Vinyl Tracker — Best Deals on Vinyl Records";
+const DEFAULT_TITLE = "The Groove Hunter — Best Deals on Vinyl Records";
 const DEFAULT_DESC  =
   "Track vinyl record prices on Amazon. Full price history and deal alerts to find the best time to buy.";
 
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Vinyl Tracker",
+    siteName: "The Groove Hunter",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESC,
   },
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 const organizationJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Vinyl Tracker",
+  name: "The Groove Hunter",
   url: SITE_URL,
   description: "Vinyl record price tracker on Amazon.",
 });

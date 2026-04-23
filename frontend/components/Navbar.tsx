@@ -32,10 +32,10 @@ export default function Navbar() {
           <VinylLogo />
           <div className="hidden sm:flex flex-col leading-none">
             <span className="font-display text-[21px] font-black text-cream tracking-tight">
-              Vinyl
+              The Groove
             </span>
             <span className="text-gold text-[9px] tracking-[0.38em] uppercase font-semibold mt-px">
-              tracker
+              Hunter
             </span>
           </div>
         </Link>

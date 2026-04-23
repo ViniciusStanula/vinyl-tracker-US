@@ -36,22 +36,22 @@ const EXAMPLE_PRICES = [
 ];
 
 export const metadata = {
-  title: "About — Vinyl Tracker",
+  title: "About — The Groove Hunter",
   description:
-    "How Vinyl Tracker works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
+    "How The Groove Hunter works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "About — Vinyl Tracker",
+    title: "About — The Groove Hunter",
     description:
-      "How Vinyl Tracker works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
+      "How The Groove Hunter works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
     url: "/about",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "About — Vinyl Tracker",
+    title: "About — The Groove Hunter",
     description:
-      "How Vinyl Tracker works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
+      "How The Groove Hunter works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
   },
 };
 
@@ -70,7 +70,7 @@ export default function AboutPage() {
       <header className="relative mb-8 overflow-hidden rounded-2xl bg-sleeve border border-groove px-6 py-7 vinyl-grooves">
         <h1 className="font-display text-3xl sm:text-4xl font-black text-cream leading-tight">
           What is{" "}
-          <span className="text-gold">Vinyl Tracker</span>
+          <span className="text-gold">The Groove Hunter</span>
         </h1>
         <p className="mt-3 text-parchment text-sm max-w-lg leading-relaxed">
           A vinyl record price tracker for Amazon. It monitors hundreds of titles

@@ -10,12 +10,12 @@ import { Suspense } from "react";
 export const revalidate = 300;
 
 export const metadata = {
-  title: "Vinyl Tracker — Best Deals on Vinyl Records",
+  title: "The Groove Hunter — Best Deals on Vinyl Records",
   description:
     "Track vinyl record prices on Amazon. Full price history updated twice daily.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Vinyl Tracker — Best Deals on Vinyl Records",
+    title: "The Groove Hunter — Best Deals on Vinyl Records",
     description:
       "Track vinyl record prices on Amazon. Full price history updated twice daily.",
     url: "/",
@@ -23,7 +23,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Vinyl Tracker — Best Deals on Vinyl Records",
+    title: "The Groove Hunter — Best Deals on Vinyl Records",
     description:
       "Track vinyl record prices on Amazon. Full price history updated twice daily.",
   },

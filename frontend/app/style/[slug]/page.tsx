@@ -188,7 +188,7 @@ export async function generateMetadata({
   if (!data) return {};
   const { canonical } = data;
   const displayName = canonical.replace(/\b\w/g, (c) => c.toUpperCase());
-  const title = truncateTitle(`${displayName} — Vinyl Deals & Price History | Vinyl Tracker`);
+  const title = truncateTitle(`${displayName} — Vinyl Deals & Price History | The Groove Hunter`);
   const description = truncateDesc(`Best ${displayName} vinyl deals: track price history and find the right record at the lowest price.`);
   return {
     title,
