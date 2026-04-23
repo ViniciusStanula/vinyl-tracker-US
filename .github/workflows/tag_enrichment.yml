@@ -1,0 +1,38 @@
+name: Last.fm Tag Enrichment
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # every 6 hours
+  workflow_dispatch:          # manual trigger from the GitHub Actions UI
+
+concurrency:
+  group: tag-enrichment
+  cancel-in-progress: false
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: crawler/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r crawler/requirements.txt
+
+      - name: Run tag enrichment
+        # Fetches Last.fm genre tags for all artists where lastfm_tags IS NULL.
+        # Safe to interrupt and re-run: already-tagged artists are skipped.
+        # At ~0.21s/artist the 55-min ceiling handles ~15,000 artists per run.
+        run: python crawler/backfill_tags.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}

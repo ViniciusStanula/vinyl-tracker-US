@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Record {
+  id          String         @id @default(uuid())
+  asin        String         @unique
+  title       String
+  artist      String
+  slug        String         @unique
+  style       String?
+  imgUrl      String?
+  url         String
+  rating      Decimal?       @db.Decimal(3, 1)
+  reviewCount Int?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  prices PriceHistory[]
+
+  @@index([artist])
+  @@index([title])
+  @@index([style])
+  @@index([slug])
+}
+
+model PriceHistory {
+  id         String   @id @default(uuid())
+  recordId   String
+  record     Record   @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  price      Decimal  @db.Decimal(10, 2)
+  capturedAt DateTime @default(now())
+
+  @@index([recordId, capturedAt(sort: Desc)])
+  @@index([capturedAt(sort: Desc)])
+}

@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* ── Warm dark palette: "Crate Digger's Den" ─────────────────── */
+  --color-record:    #0c0a08;   /* deepest bg — near-black, warm */
+  --color-sleeve:    #171210;   /* card surface — dark warm brown */
+  --color-label:     #201614;   /* elevated surface — record label dark */
+  --color-groove:    #2b1e17;   /* borders, dividers */
+  --color-wax:       #3d2c21;   /* stronger border/hover surface */
+  --color-patina:    #5a4232;   /* muted element */
+
+  /* ── Gold / amber accent ─────────────────────────────────────── */
+  --color-gold:      #d98f0e;   /* primary accent */
+  --color-goldlit:   #f0ab28;   /* bright hover/active state */
+  --color-goldmute:  #7a4f0e;   /* muted/disabled gold */
+
+  /* ── Status ──────────────────────────────────────────────────── */
+  --color-cut:       #b81828;   /* discount/danger red */
+  --color-deal:      #1e7a50;   /* positive / deal found */
+  --color-deallit:   #35c47a;   /* bright positive */
+
+  /* ── Text ────────────────────────────────────────────────────── */
+  --color-cream:     #f0e6d0;   /* primary text */
+  --color-parchment: #b8936a;   /* secondary text */
+  --color-dust:      #6e4e38;   /* muted/placeholder */
+  --color-ash:       #3d2a20;   /* very muted */
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  --font-display: var(--font-fraunces, serif);
+  --font-sans:    var(--font-dm-sans, system-ui, sans-serif);
+}
+
+:root {
+  --background: #0c0a08;
+  --foreground: #f0e6d0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans, system-ui, sans-serif);
+}
+
+/* ── Warm custom scrollbar ────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 5px; height: 5px; }
+::-webkit-scrollbar-track    { background: var(--color-record); }
+::-webkit-scrollbar-thumb    { background: var(--color-wax); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-patina); }
+
+/* ── Vinyl groove background decoration ──────────────────────────── */
+.vinyl-grooves {
+  background-image:
+    radial-gradient(circle at 110% -10%,
+      transparent 22%,   rgba(217,143,14,0.045) 22.5%,  transparent 23.5%),
+    radial-gradient(circle at 110% -10%,
+      transparent 33%,   rgba(217,143,14,0.038) 33.5%,  transparent 34.5%),
+    radial-gradient(circle at 110% -10%,
+      transparent 44%,   rgba(217,143,14,0.030) 44.5%,  transparent 45.5%),
+    radial-gradient(circle at 110% -10%,
+      transparent 55%,   rgba(217,143,14,0.024) 55.5%,  transparent 56.5%),
+    radial-gradient(circle at 110% -10%,
+      transparent 66%,   rgba(217,143,14,0.018) 66.5%,  transparent 67.5%),
+    radial-gradient(circle at 110% -10%,
+      transparent 77%,   rgba(217,143,14,0.012) 77.5%,  transparent 78.5%),
+    radial-gradient(circle at 110% -10%,
+      transparent 88%,   rgba(217,143,14,0.007) 88.5%,  transparent 89.5%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* ── Utilities ────────────────────────────────────────────────────── */
+@keyframes vinyl-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.loading-pulse {
+  animation: vinyl-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out both;
+}
