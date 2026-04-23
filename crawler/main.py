@@ -954,7 +954,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
                 offscreen = row.select_one(".a-offscreen")
                 if offscreen:
                     p = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
-                    if p and p >= MIN_PRICE_BRL:
+                    if p and p >= MIN_PRICE:
                         tmm_vinyl_price = p
                         log.debug(
                             "parse_product_page: vinyl price from format table: %.2f", p
@@ -969,7 +969,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
                 if _VINYL_LABEL_RE.search(swatch.get_text(" ", strip=True)):
                     for price_el in swatch.select("[aria-label]"):
                         p = parse_price_br(price_el.get("aria-label", "").replace("\xa0", ""))
-                        if p and p >= MIN_PRICE_BRL:
+                        if p and p >= MIN_PRICE:
                             tmm_vinyl_price = p
                             log.debug(
                                 "parse_product_page: vinyl price from tmmSwatches swatch: %.2f", p
@@ -979,7 +979,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
                         offscreen = swatch.select_one(".a-offscreen")
                         if offscreen:
                             p = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
-                            if p and p >= MIN_PRICE_BRL:
+                            if p and p >= MIN_PRICE:
                                 tmm_vinyl_price = p
                                 log.debug(
                                     "parse_product_page: vinyl price from tmmSwatches offscreen: %.2f", p
@@ -1045,7 +1045,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
             offscreen = container.select_one(".a-offscreen")
             if offscreen:
                 p = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
-                if p and p >= MIN_PRICE_BRL:
+                if p and p >= MIN_PRICE:
                     price = p
                     break
 
@@ -1058,7 +1058,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
                 ).strip().replace(".", "")
                 frac_text = frac_el.get_text(strip=True) if frac_el else "00"
                 p = parse_price_br(f"{whole_text},{frac_text}")
-                if p and p >= MIN_PRICE_BRL:
+                if p and p >= MIN_PRICE:
                     price = p
                     break
 
@@ -1069,7 +1069,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
             text = el.get_text(strip=True).replace("\xa0", "")
             if text.startswith("R$") or re.match(r"^\d+[,.]", text):
                 p = parse_price_br(text)
-                if p and p >= MIN_PRICE_BRL:
+                if p and p >= MIN_PRICE:
                     price = p
                     break
 
@@ -1355,7 +1355,7 @@ def extract_price(card) -> float | None:
         if offscreen:
             text = offscreen.get_text(strip=True).replace("\xa0", "").strip()
             p = parse_price_br(text)
-            if p and p >= MIN_PRICE_BRL:
+            if p and p >= MIN_PRICE:
                 log.debug("Price via price-recipe a-offscreen: %.2f", p)
                 return p
 
@@ -1366,13 +1366,13 @@ def extract_price(card) -> float | None:
         if a11y:
             text = a11y.get_text(strip=True).replace("\xa0", "").strip()
             p = parse_price_br(text)
-            if p and p >= MIN_PRICE_BRL:
+            if p and p >= MIN_PRICE:
                 log.debug("Price via apex-core-price-identifier a11y: %.2f", p)
                 return p
         price_span = apex.select_one(".priceToPay, .apex-pricetopay-value")
         if price_span and not _price_block_is_instalment(price_span):
             p = _read_price_block(price_span)
-            if p and p >= MIN_PRICE_BRL:
+            if p and p >= MIN_PRICE:
                 log.debug("Price via apex-core-price-identifier priceToPay: %.2f", p)
                 return p
 
@@ -1385,7 +1385,7 @@ def extract_price(card) -> float | None:
         for block in price_section.select(".a-price"):
             if not _price_block_is_instalment(block):
                 p = _read_price_block(block)
-                if p and p >= MIN_PRICE_BRL:
+                if p and p >= MIN_PRICE:
                     log.debug("Price via price-instructions-style: %.2f", p)
                     return p
 
@@ -1399,7 +1399,7 @@ def extract_price(card) -> float | None:
         if el and not _is_in_secondary_section(el):
             text = el.get_text(strip=True).replace("\xa0", "").strip()
             p = parse_price_br(text)
-            if p and p >= MIN_PRICE_BRL:
+            if p and p >= MIN_PRICE:
                 log.debug("Price via a11y label '%s': %.2f", a11y_sel, p)
                 return p
 
@@ -1414,7 +1414,7 @@ def extract_price(card) -> float | None:
                 continue
             if not _price_block_is_instalment(block):
                 p = _read_price_block(block)
-                if p and p >= MIN_PRICE_BRL:
+                if p and p >= MIN_PRICE:
                     log.debug("Price via selector '%s': %.2f", sel, p)
                     return p
 
@@ -1425,7 +1425,7 @@ def extract_price(card) -> float | None:
         if _price_block_is_instalment(block):
             continue
         p = _read_price_block(block)
-        if p and p >= MIN_PRICE_BRL:
+        if p and p >= MIN_PRICE:
             log.debug("Price via first-valid block: %.2f", p)
             return p
 
@@ -1433,7 +1433,7 @@ def extract_price(card) -> float | None:
     card_text = card.get_text(" ", strip=True)
     for m in re.finditer(r"R\$\s*[\d.,]+", card_text):
         p = parse_price_br(m.group())
-        if p and p >= MIN_PRICE_BRL:
+        if p and p >= MIN_PRICE:
             log.debug("Price via card-text regex: %.2f", p)
             return p
 
