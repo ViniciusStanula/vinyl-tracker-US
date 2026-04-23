@@ -3,36 +3,36 @@ import GraficoPreco from "@/components/GraficoPreco";
 import Link from "next/link";
 
 const EXAMPLE_PRICES = [
-  { data: "03/23", dataFull: "03/23/2026", valor: 29.99 },
-  { data: "03/24", dataFull: "03/24/2026", valor: 29.99 },
-  { data: "03/25", dataFull: "03/25/2026", valor: 31.99 },
-  { data: "03/26", dataFull: "03/26/2026", valor: 31.99 },
-  { data: "03/27", dataFull: "03/27/2026", valor: 32.99 },
-  { data: "03/28", dataFull: "03/28/2026", valor: 32.99 },
-  { data: "03/29", dataFull: "03/29/2026", valor: 32.99 },
-  { data: "03/30", dataFull: "03/30/2026", valor: 30.99 },
-  { data: "03/31", dataFull: "03/31/2026", valor: 30.99 },
-  { data: "04/01", dataFull: "04/01/2026", valor: 29.99 },
-  { data: "04/02", dataFull: "04/02/2026", valor: 29.99 },
-  { data: "04/03", dataFull: "04/03/2026", valor: 31.49 },
-  { data: "04/04", dataFull: "04/04/2026", valor: 31.49 },
-  { data: "04/05", dataFull: "04/05/2026", valor: 31.49 },
-  { data: "04/06", dataFull: "04/06/2026", valor: 29.99 },
-  { data: "04/07", dataFull: "04/07/2026", valor: 28.49 },
-  { data: "04/08", dataFull: "04/08/2026", valor: 28.49 },
-  { data: "04/09", dataFull: "04/09/2026", valor: 27.99 },
-  { data: "04/10", dataFull: "04/10/2026", valor: 27.99 },
-  { data: "04/11", dataFull: "04/11/2026", valor: 27.99 },
-  { data: "04/12", dataFull: "04/12/2026", valor: 25.99 },
-  { data: "04/13", dataFull: "04/13/2026", valor: 25.99 },
-  { data: "04/14", dataFull: "04/14/2026", valor: 26.99 },
-  { data: "04/15", dataFull: "04/15/2026", valor: 26.99 },
-  { data: "04/16", dataFull: "04/16/2026", valor: 23.99 },
-  { data: "04/17", dataFull: "04/17/2026", valor: 23.99 },
-  { data: "04/18", dataFull: "04/18/2026", valor: 23.99 },
-  { data: "04/19", dataFull: "04/19/2026", valor: 21.99 },
-  { data: "04/20", dataFull: "04/20/2026", valor: 21.99 },
-  { data: "04/21", dataFull: "04/21/2026", valor: 19.99 },
+  { date: "03/23", dateFull: "03/23/2026", value: 29.99 },
+  { date: "03/24", dateFull: "03/24/2026", value: 29.99 },
+  { date: "03/25", dateFull: "03/25/2026", value: 31.99 },
+  { date: "03/26", dateFull: "03/26/2026", value: 31.99 },
+  { date: "03/27", dateFull: "03/27/2026", value: 32.99 },
+  { date: "03/28", dateFull: "03/28/2026", value: 32.99 },
+  { date: "03/29", dateFull: "03/29/2026", value: 32.99 },
+  { date: "03/30", dateFull: "03/30/2026", value: 30.99 },
+  { date: "03/31", dateFull: "03/31/2026", value: 30.99 },
+  { date: "04/01", dateFull: "04/01/2026", value: 29.99 },
+  { date: "04/02", dateFull: "04/02/2026", value: 29.99 },
+  { date: "04/03", dateFull: "04/03/2026", value: 31.49 },
+  { date: "04/04", dateFull: "04/04/2026", value: 31.49 },
+  { date: "04/05", dateFull: "04/05/2026", value: 31.49 },
+  { date: "04/06", dateFull: "04/06/2026", value: 29.99 },
+  { date: "04/07", dateFull: "04/07/2026", value: 28.49 },
+  { date: "04/08", dateFull: "04/08/2026", value: 28.49 },
+  { date: "04/09", dateFull: "04/09/2026", value: 27.99 },
+  { date: "04/10", dateFull: "04/10/2026", value: 27.99 },
+  { date: "04/11", dateFull: "04/11/2026", value: 27.99 },
+  { date: "04/12", dateFull: "04/12/2026", value: 25.99 },
+  { date: "04/13", dateFull: "04/13/2026", value: 25.99 },
+  { date: "04/14", dateFull: "04/14/2026", value: 26.99 },
+  { date: "04/15", dateFull: "04/15/2026", value: 26.99 },
+  { date: "04/16", dateFull: "04/16/2026", value: 23.99 },
+  { date: "04/17", dateFull: "04/17/2026", value: 23.99 },
+  { date: "04/18", dateFull: "04/18/2026", value: 23.99 },
+  { date: "04/19", dateFull: "04/19/2026", value: 21.99 },
+  { date: "04/20", dateFull: "04/20/2026", value: 21.99 },
+  { date: "04/21", dateFull: "04/21/2026", value: 19.99 },
 ];
 
 export const metadata = {
@@ -180,7 +180,7 @@ export default function AboutPage() {
         </p>
 
         <div className="rounded-xl border border-groove bg-label px-4 pt-4 pb-2">
-          <GraficoPreco precos={EXAMPLE_PRICES} />
+          <GraficoPreco points={EXAMPLE_PRICES} />
         </div>
         <p className="mt-2 text-center text-dust text-xs">
           Example: 30-day price trend for a vinyl record
