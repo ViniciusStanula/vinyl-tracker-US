@@ -8,7 +8,7 @@ export default function StyleTags({ tags }: { tags: string[] }) {
       {tags.map((tag) => (
         <Link
           key={tag}
-          href={`/estilo/${slugifyStyle(tag)}`}
+          href={`/genre/${slugifyStyle(tag)}`}
           className="inline-flex items-center text-xs px-2.5 py-0.5 rounded-full bg-groove border border-wax/40 text-dust hover:text-parchment hover:border-wax/70 transition-colors"
         >
           {tag}

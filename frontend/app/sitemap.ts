@@ -9,7 +9,7 @@ const base =
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export async function generateSitemaps() {
-  return [{ id: "static" }, { id: "artists" }, { id: "records" }, { id: "styles" }];
+  return [{ id: "static" }, { id: "artists" }, { id: "records" }, { id: "genres" }];
 }
 
 export default async function sitemap(props: {
@@ -65,7 +65,7 @@ export default async function sitemap(props: {
     }
   }
 
-  if (id === "styles") {
+  if (id === "genres") {
     try {
       const rows = await prisma.$queryRaw<{ tag: string }[]>`
         SELECT DISTINCT unnest(string_to_array(lastfm_tags, ', ')) AS tag
@@ -81,7 +81,7 @@ export default async function sitemap(props: {
         if (!slug || seenSlugs.has(slug)) continue;
         seenSlugs.add(slug);
         routes.push({
-          url: `${base}/style/${slug}`,
+          url: `${base}/genre/${slug}`,
           changeFrequency: "weekly",
           priority: 0.5,
         });

@@ -42,7 +42,8 @@ const nextConfig: NextConfig = {
       { source: "/artista/:slug", destination: "/artist/:slug", permanent: true },
       { source: "/disco/:slug",   destination: "/record/:slug",  permanent: true },
       { source: "/disco",         destination: "/record",         permanent: true },
-      { source: "/estilo/:slug",  destination: "/style/:slug",   permanent: true },
+      { source: "/estilo/:slug",  destination: "/genre/:slug",   permanent: true },
+      { source: "/style/:slug",   destination: "/genre/:slug",   permanent: true },
       { source: "/sobre",         destination: "/about",          permanent: true },
     ];
   },

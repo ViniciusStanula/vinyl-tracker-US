@@ -129,7 +129,7 @@ const _getStylePageData = unstable_cache(
 
     return {
       canonical,
-      discos: rows.map((row) => {
+      discos: rows.map((row: (typeof rows)[number]) => {
         let sparkline: number[] = [];
         if (Array.isArray(row.sparkline)) {
           sparkline = (row.sparkline as unknown[]).map(Number).filter((n) => !isNaN(n));
@@ -193,11 +193,11 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/style/${slug}` },
+    alternates: { canonical: `/genre/${slug}` },
     openGraph: {
       title,
       description,
-      url: `/style/${slug}`,
+      url: `/genre/${slug}`,
       type: "website",
     },
     twitter: {
@@ -294,7 +294,7 @@ export default async function StylePage({
         "@type": "ListItem",
         position: 2,
         name: displayName,
-        item: `${siteUrl}/style/${slug}`,
+        item: `${siteUrl}/genre/${slug}`,
       },
     ],
   });
