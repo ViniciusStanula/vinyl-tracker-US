@@ -45,6 +45,8 @@ jobs:
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           REVALIDATE_URL: ${{ secrets.REVALIDATE_URL }}
           REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          INDEXNOW_HOST: ${{ secrets.INDEXNOW_HOST }}
 
       - name: Open issue on failure
         if: failure()
