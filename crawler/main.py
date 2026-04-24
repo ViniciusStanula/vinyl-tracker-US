@@ -398,6 +398,14 @@ _ARTIST_REJECT_PHRASES = (
     "r$",                     # embedded Brazilian real sign e.g. "r$0,00"
     "outro formato",          # "Outro formato:" — Amazon format-switcher label
     "other format",           # same in English
+    # Shipping / delivery info leaked by broad fallback selectors
+    "delivery",               # "FREE deliveryApr 29 - May 1"
+    "fastest delivery",
+    "tomorrow",               # "Fastest Deliverytomorrow, Apr 25"
+    "arrives",
+    "ships",
+    "in stock",
+    "out of stock",
 )
 _UNKNOWN_ARTIST = "Artista não identificado"
 
@@ -410,6 +418,10 @@ def is_fake_artist(artist: str) -> bool:
 
 
 _EMBEDDED_PRICE_RE = re.compile(r"\d+[,\.]\d{2}")  # catches "0,00", "29.90" etc.
+_DATE_IN_TEXT_RE = re.compile(
+    r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+\d{1,2}\b",
+    re.IGNORECASE,
+)
 
 
 def _is_plausible_artist(text: str) -> bool:
@@ -424,6 +436,8 @@ def _is_plausible_artist(text: str) -> bool:
     if re.fullmatch(r"[\d.,\s/\\-]+", text):
         return False
     if _EMBEDDED_PRICE_RE.search(text):
+        return False
+    if _DATE_IN_TEXT_RE.search(text):  # shipping dates e.g. "Apr 29 - May 1"
         return False
     return True
 
