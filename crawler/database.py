@@ -574,17 +574,28 @@ def bulk_update_tags(conn, artist_to_tags: dict[str, str]) -> int:
         return 0
 
     rows = [(tags, artist) for artist, tags in artist_to_tags.items()]
-    with _cursor(conn) as cur:
-        psycopg2.extras.execute_batch(
-            cur,
-            'UPDATE "Record" SET lastfm_tags = %s WHERE artist = %s',
-            rows,
-            page_size=500,
-        )
-        updated = cur.rowcount
-    conn.commit()
-    log.debug("bulk_update_tags: updated tags for %d artist values.", len(rows))
-    return updated
+    for attempt in range(3):
+        try:
+            with _cursor(conn) as cur:
+                psycopg2.extras.execute_batch(
+                    cur,
+                    'UPDATE "Record" SET lastfm_tags = %s WHERE artist = %s',
+                    rows,
+                    page_size=50,
+                )
+                updated = cur.rowcount
+            conn.commit()
+            log.debug("bulk_update_tags: updated tags for %d artist values.", len(rows))
+            return updated
+        except psycopg2.errors.DeadlockDetected:
+            conn.rollback()
+            if attempt == 2:
+                raise
+            wait = 2 ** attempt
+            log.warning("bulk_update_tags: deadlock on attempt %d, retrying in %ds.", attempt + 1, wait)
+            import time as _time
+            _time.sleep(wait)
+    return 0
 
 
 def delete_old_price_history(conn, days: int = 365) -> int:
