@@ -280,8 +280,9 @@ _BOT_SIGNAL_RE = re.compile(
     r"|Prove you.re not a robot",
     re.IGNORECASE,
 )
-_PRICE_CLEAN_RE = re.compile(r"R\$\s*|\xa0|\s")
-_PRICE_NUM_RE   = re.compile(r"\d+\.?\d*")
+_PRICE_CLEAN_RE    = re.compile(r"R\$\s*|\xa0|\s")
+_PRICE_CLEAN_US_RE = re.compile(r"[$,\xa0\s]")
+_PRICE_NUM_RE      = re.compile(r"\d+\.?\d*")
 
 # ─────────────────────────────────────────────────────────────
 #  Helpers
@@ -308,14 +309,14 @@ def affiliate_link(asin: str) -> str:
     return f"https://www.amazon.com/dp/{asin}?tag={ASSOCIATE_TAG}"
 
 
-def parse_price_br(text: str) -> float | None:
+def parse_price_us(text: str) -> float | None:
+    """Parse a US-formatted price like '$38.65' or '$3,865.00'."""
     if not text:
         return None
-    cleaned = _PRICE_CLEAN_RE.sub("", text)
-    cleaned = cleaned.replace(".", "").replace(",", ".")
+    cleaned = _PRICE_CLEAN_US_RE.sub("", text)
     m = _PRICE_NUM_RE.search(cleaned)
     if m is None:
-        log.debug("parse_price_br: no numeric value found in %r (cleaned: %r)", text, cleaned)
+        log.debug("parse_price_us: no numeric value found in %r (cleaned: %r)", text, cleaned)
         return None
     return float(m.group())
 
@@ -953,7 +954,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
             if _VINYL_LABEL_RE.search(row.get_text(" ", strip=True)):
                 offscreen = row.select_one(".a-offscreen")
                 if offscreen:
-                    p = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
+                    p = parse_price_us(offscreen.get_text(strip=True).replace("\xa0", ""))
                     if p and p >= MIN_PRICE:
                         tmm_vinyl_price = p
                         log.debug(
@@ -968,7 +969,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
             for swatch in soup.select("#tmmSwatches .swatchElement"):
                 if _VINYL_LABEL_RE.search(swatch.get_text(" ", strip=True)):
                     for price_el in swatch.select("[aria-label]"):
-                        p = parse_price_br(price_el.get("aria-label", "").replace("\xa0", ""))
+                        p = parse_price_us(price_el.get("aria-label", "").replace("\xa0", ""))
                         if p and p >= MIN_PRICE:
                             tmm_vinyl_price = p
                             log.debug(
@@ -978,7 +979,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
                     if tmm_vinyl_price is None:
                         offscreen = swatch.select_one(".a-offscreen")
                         if offscreen:
-                            p = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
+                            p = parse_price_us(offscreen.get_text(strip=True).replace("\xa0", ""))
                             if p and p >= MIN_PRICE:
                                 tmm_vinyl_price = p
                                 log.debug(
@@ -1044,7 +1045,7 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
 
             offscreen = container.select_one(".a-offscreen")
             if offscreen:
-                p = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
+                p = parse_price_us(offscreen.get_text(strip=True).replace("\xa0", ""))
                 if p and p >= MIN_PRICE:
                     price = p
                     break
@@ -1055,9 +1056,9 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
                 whole_text = "".join(
                     t for t in whole_el.strings
                     if t.strip() and t.strip() not in (",", ".")
-                ).strip().replace(".", "")
+                ).strip().replace(",", "")
                 frac_text = frac_el.get_text(strip=True) if frac_el else "00"
-                p = parse_price_br(f"{whole_text},{frac_text}")
+                p = parse_price_us(f"{whole_text}.{frac_text}")
                 if p and p >= MIN_PRICE:
                     price = p
                     break
@@ -1067,8 +1068,8 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
     if price is None and not has_format_switcher:
         for el in soup.select(".a-offscreen"):
             text = el.get_text(strip=True).replace("\xa0", "")
-            if text.startswith("R$") or re.match(r"^\d+[,.]", text):
-                p = parse_price_br(text)
+            if text.startswith("$") or re.match(r"^\d+[,.]", text):
+                p = parse_price_us(text)
                 if p and p >= MIN_PRICE:
                     price = p
                     break
@@ -1303,7 +1304,7 @@ def _read_price_block(block) -> float | None:
         if a11y:
             text = a11y.get_text(strip=True).replace("\xa0", "").strip()
             if text:
-                p = parse_price_br(text)
+                p = parse_price_us(text)
                 if p and p > 0:
                     return p
 
@@ -1311,7 +1312,7 @@ def _read_price_block(block) -> float | None:
     if offscreen:
         text = offscreen.get_text(strip=True).replace("\xa0", "").strip()
         if text:
-            p = parse_price_br(text)
+            p = parse_price_us(text)
             if p and p > 0:
                 return p
 
@@ -1321,9 +1322,9 @@ def _read_price_block(block) -> float | None:
         whole_text = "".join(
             t for t in whole_el.strings
             if t.strip() and t.strip() not in (",", ".")
-        ).strip().replace(".", "")
+        ).strip().replace(",", "")
         frac_text = frac_el.get_text(strip=True) if frac_el else "00"
-        p = parse_price_br(f"{whole_text},{frac_text}")
+        p = parse_price_us(f"{whole_text}.{frac_text}")
         if p and p > 0:
             return p
 
@@ -1354,7 +1355,7 @@ def extract_price(card) -> float | None:
         )
         if offscreen:
             text = offscreen.get_text(strip=True).replace("\xa0", "").strip()
-            p = parse_price_br(text)
+            p = parse_price_us(text)
             if p and p >= MIN_PRICE:
                 log.debug("Price via price-recipe a-offscreen: %.2f", p)
                 return p
@@ -1365,7 +1366,7 @@ def extract_price(card) -> float | None:
         a11y = apex.select_one("#apex-pricetopay-accessibility-label, [id$='-pricetopay-accessibility-label']")
         if a11y:
             text = a11y.get_text(strip=True).replace("\xa0", "").strip()
-            p = parse_price_br(text)
+            p = parse_price_us(text)
             if p and p >= MIN_PRICE:
                 log.debug("Price via apex-core-price-identifier a11y: %.2f", p)
                 return p
@@ -1398,7 +1399,7 @@ def extract_price(card) -> float | None:
         el = card.select_one(a11y_sel)
         if el and not _is_in_secondary_section(el):
             text = el.get_text(strip=True).replace("\xa0", "").strip()
-            p = parse_price_br(text)
+            p = parse_price_us(text)
             if p and p >= MIN_PRICE:
                 log.debug("Price via a11y label '%s': %.2f", a11y_sel, p)
                 return p
@@ -1432,7 +1433,7 @@ def extract_price(card) -> float | None:
     # ── Prioridade 6: regex no texto completo (último recurso) ────────────
     card_text = card.get_text(" ", strip=True)
     for m in re.finditer(r"R\$\s*[\d.,]+", card_text):
-        p = parse_price_br(m.group())
+        p = parse_price_us(m.group())
         if p and p >= MIN_PRICE:
             log.debug("Price via card-text regex: %.2f", p)
             return p
