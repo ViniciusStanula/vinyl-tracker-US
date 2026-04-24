@@ -245,7 +245,7 @@ _RATING_TEXT_RE = re.compile(
     re.IGNORECASE,
 )
 _PRICE_START_RE = re.compile(r"^R\$|^\$|^\d+[.,]")
-_VINYL_LABEL_RE = re.compile(r"vinil|vinyl", re.IGNORECASE)
+_VINYL_LABEL_RE = re.compile(r"vinil|vinyl|\blp\b|lp\s+record|lp\s+vinyl|\d+[\"']?\s*(?:inch|in\.?)\s+vinyl", re.IGNORECASE)
 
 _CD_RE = re.compile(
     r"\bcd\b|\[cd\]|\(cd\)|compact disc|\bcd\s*\d",
