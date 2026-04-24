@@ -12,7 +12,7 @@ concurrency:
 jobs:
   enrich:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 300
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -31,7 +31,7 @@ jobs:
       - name: Run tag enrichment
         # Fetches Last.fm genre tags for all artists where lastfm_tags IS NULL.
         # Safe to interrupt and re-run: already-tagged artists are skipped.
-        # At ~0.21s/artist the 55-min ceiling handles ~15,000 artists per run.
+        # API calls take ~2s each; 300-min ceiling handles ~9,000 artists per run.
         run: python crawler/backfill_tags.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
