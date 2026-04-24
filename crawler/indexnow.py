@@ -69,10 +69,10 @@ def build_urls(items: list[dict], db_styles: list[str] | None = None) -> list[st
             style_slug = _slugify_style(tag)
             if style_slug and style_slug not in seen_styles:
                 seen_styles.add(style_slug)
-                urls.append(f"{_BASE}/style/{style_slug}")
+                urls.append(f"{_BASE}/genre/{style_slug}")
 
     log.info(
-        "IndexNow: built %d URLs (%d record, %d artist, %d style).",
+        "IndexNow: built %d URLs (%d record, %d artist, %d genre).",
         len(urls),
         len(urls) - len(seen_artists) - len(seen_styles),
         len(seen_artists),

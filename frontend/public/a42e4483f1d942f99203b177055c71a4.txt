@@ -1,4 +1,0 @@
-INDEXNOW_PLACEHOLDER
-Rename this file to <your-new-key>.txt and replace this content with just the key value.
-Generate a new key at https://www.bing.com/indexnow or https://api.indexnow.org/
-Set INDEXNOW_KEY and INDEXNOW_HOST in your environment variables.

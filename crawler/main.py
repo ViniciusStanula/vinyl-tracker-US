@@ -2358,7 +2358,7 @@ def main():
             from indexnow import submit_crawl_results as _indexnow_submit
             with conn.cursor() as _cur:
                 _cur.execute(
-                    'SELECT style FROM "Record" WHERE style IS NOT NULL AND available = true'
+                    "SELECT lastfm_tags FROM \"Record\" WHERE lastfm_tags IS NOT NULL AND lastfm_tags != '' AND available = true"
                 )
                 _db_styles = [row[0] for row in _cur.fetchall()]
             _indexnow_submit(all_items, db_styles=_db_styles)
