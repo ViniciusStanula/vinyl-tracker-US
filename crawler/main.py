@@ -2257,7 +2257,7 @@ def main():
                 if new_browse:
                     with conn.cursor() as _cur:
                         _cur.execute(
-                            'SELECT asin FROM "Disco" WHERE asin = ANY(%s)',
+                            'SELECT asin FROM "Record" WHERE asin = ANY(%s)',
                             (list(new_browse),),
                         )
                         already_in_db = {row[0] for row in _cur.fetchall()}
