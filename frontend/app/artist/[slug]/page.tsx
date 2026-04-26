@@ -92,27 +92,21 @@ const _getArtistPageData = unstable_cache(
 
     const discoIds = discos.map((d) => d.id);
 
-    const [dealMetaRows, lastfmTagsRows] = await Promise.all([
-      prisma.$queryRaw<{
-        id: string;
-        deal_score: number | null;
-        confidence_level: string | null;
-        last_crawled_at: Date | null;
-        available: boolean;
-      }[]>`
-        SELECT id::text, deal_score, confidence_level, last_crawled_at, available
-        FROM "Record"
-        WHERE id::text = ANY(${discoIds})
-      `,
-      prisma.$queryRaw<{ id: string; lastfmTags: string | null }[]>`
-        SELECT id::text, lastfm_tags AS "lastfmTags"
-        FROM "Record"
-        WHERE id::text = ANY(${discoIds})
-      `,
-    ]);
-    const lastfmTagsById = Object.fromEntries(
-      lastfmTagsRows.map((r) => [r.id, r.lastfmTags])
-    );
+    const metaRows = await prisma.$queryRaw<{
+      id: string;
+      deal_score: number | null;
+      confidence_level: string | null;
+      last_crawled_at: Date | null;
+      available: boolean;
+      lastfmTags: string | null;
+    }[]>`
+      SELECT id::text, deal_score, confidence_level, last_crawled_at, available,
+             lastfm_tags AS "lastfmTags"
+      FROM "Record"
+      WHERE id::text = ANY(${discoIds})
+    `;
+
+    const metaById = Object.fromEntries(metaRows.map((r) => [r.id, r]));
 
     return {
       canonical,
@@ -123,7 +117,7 @@ const _getArtistPageData = unstable_cache(
         artist: d.artist,
         slug: d.slug,
         style: d.style,
-        lastfmTags: lastfmTagsById[d.id] ?? null,
+        lastfmTags: metaById[d.id]?.lastfmTags ?? null,
         imgUrl: d.imgUrl,
         url: d.url,
         rating: d.rating ? String(d.rating) : null,
@@ -134,7 +128,7 @@ const _getArtistPageData = unstable_cache(
         })),
       })),
       dealMeta: Object.fromEntries(
-        dealMetaRows.map((r) => [r.id, {
+        metaRows.map((r) => [r.id, {
           id: r.id,
           deal_score: r.deal_score !== null ? Number(r.deal_score) : null,
           confidence_level: r.confidence_level,

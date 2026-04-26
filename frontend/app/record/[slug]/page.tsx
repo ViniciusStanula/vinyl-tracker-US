@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import GraficoPreco from "@/components/GraficoPreco";
 import DiscoCard from "@/components/DiscoCard";
 import BackToTop from "@/components/BackToTop";
@@ -12,6 +13,19 @@ import { truncateTitle, truncateDesc } from "@/lib/seo";
 
 export const revalidate = 7200;
 
+const getRecord = cache(async (slug: string) => {
+  const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
+  return prisma.record.findUnique({
+    where: { slug },
+    include: {
+      prices: {
+        where: { capturedAt: { gte: oneYearAgo } },
+        orderBy: { capturedAt: "asc" },
+      },
+    },
+  });
+});
+
 export async function generateMetadata({
   params,
 }: {
@@ -19,7 +33,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   try {
-    const disco = await prisma.record.findUnique({ where: { slug } });
+    const disco = await getRecord(slug);
     if (!disco) return {};
     const title = truncateTitle(`${disco.title} — ${disco.artist} on Vinyl | Price History`);
     const description = truncateDesc(`Buy ${disco.title} by ${disco.artist} at the best price. View full price history and the best deals available now.`);
@@ -68,17 +82,8 @@ export default async function RecordPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
 
-  const disco = await prisma.record.findUnique({
-    where: { slug },
-    include: {
-      prices: {
-        where: { capturedAt: { gte: oneYearAgo } },
-        orderBy: { capturedAt: "asc" },
-      },
-    },
-  });
+  const disco = await getRecord(slug);
 
   if (!disco) notFound();
 

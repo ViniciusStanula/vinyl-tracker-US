@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "./prisma";
 import { slugifyArtist } from "./slugify";
 import { fetchTopArtists } from "./lastfm";
@@ -164,3 +165,9 @@ export async function queryCarouselDiscos(): Promise<ProcessedDisco[]> {
     return [];
   }
 }
+
+export const cachedQueryCarouselDiscos = unstable_cache(
+  queryCarouselDiscos,
+  ["carousel-discos"],
+  { tags: ["prices"], revalidate: 7200 },
+);

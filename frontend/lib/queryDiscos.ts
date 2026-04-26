@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
 
@@ -238,3 +239,9 @@ export async function queryDiscos(params: {
 
   return { items, total, totalPages };
 }
+
+export const cachedQueryDiscos = unstable_cache(
+  queryDiscos,
+  ["query-discos"],
+  { tags: ["prices"], revalidate: 7200 },
+);

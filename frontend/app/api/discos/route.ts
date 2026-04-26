@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { queryDiscos } from "@/lib/queryDiscos";
+import { cachedQueryDiscos } from "@/lib/queryDiscos";
 
 const ALLOWED_SORTS = new Set(["discount", "lowest-price", "highest-price", "top-rated", "az", "deals"]);
 
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const precoMax    = precoMaxStr ? Number(precoMaxStr) : null;
 
   try {
-    const { items, total, totalPages } = await queryDiscos({
+    const { items, total, totalPages } = await cachedQueryDiscos({
       searchTerm: q.trim(),
       sort,
       artist: artista,
