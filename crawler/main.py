@@ -251,6 +251,10 @@ _CD_RE = re.compile(
     r"\bcd\b|\[cd\]|\(cd\)|compact disc|\bcd\s*\d",
     re.IGNORECASE,
 )
+_CASSETTE_RE = re.compile(
+    r"\bcassette\b|\baudio\s+cassette\b|\bcassette\s+tape\b",
+    re.IGNORECASE,
+)
 _VINYL_TITLE_RE = re.compile(
     r"vinil|vinyl|\blp\b"
     r'|\b7["\']\b'
@@ -324,12 +328,16 @@ def parse_price_us(text: str) -> float | None:
 def is_vinyl(title: str, card=None) -> bool:
     if _CD_RE.search(title):
         return False
+    if _CASSETTE_RE.search(title):
+        return False
 
     if _VINYL_TITLE_RE.search(title):
         return True
 
     if card is not None:
         card_text = card.get_text(" ", strip=True)
+        if _CASSETTE_RE.search(card_text) and not _VINYL_TITLE_RE.search(title):
+            return False
         if _VINYL_CARD_RE.search(card_text):
             if not (_CD_RE.search(card_text) and not _VINYL_TITLE_RE.search(title)):
                 return True
@@ -1009,7 +1017,12 @@ def parse_product_page(soup) -> tuple[float | None, bool, int | None]:
             _VINYL_LABEL_RE.search(selected_swatch.get_text(" ", strip=True))
         )
     elif not has_format_switcher:
-        # No swatch widget at all → single-format page; treat as vinyl.
+        # No swatch widget → single-format page; treat as vinyl unless title
+        # explicitly identifies a non-vinyl format (cassette, CD).
+        page_title_el = soup.select_one("#productTitle")
+        page_title = page_title_el.get_text(strip=True) if page_title_el else ""
+        if _CASSETTE_RE.search(page_title) or _CD_RE.search(page_title):
+            return None, in_stock, review_count
         selected_is_vinyl = True
     else:
         # Multi-format page but no swatch marked selected (page loaded for a
