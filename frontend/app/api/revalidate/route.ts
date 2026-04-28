@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   if (!body || body.secret !== process.env.REVALIDATE_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  revalidateTag("prices");
+  revalidateTag("prices", { expire: 0 });
   revalidatePath("/");
   revalidatePath("/record");
   revalidatePath("/record/[slug]", "page");
