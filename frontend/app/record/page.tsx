@@ -1,11 +1,11 @@
-import { queryDiscos } from "@/lib/queryDiscos";
+import { cachedQueryDiscos } from "@/lib/queryDiscos";
 import SortBar from "@/components/SortBar";
 import InfiniteGrid from "@/components/InfiniteGrid";
 import BackToTop from "@/components/BackToTop";
 import Link from "next/link";
 import { Suspense } from "react";
 
-export const revalidate = 300;
+export const revalidate = 7200;
 
 export const metadata = {
   title: "All Records — The Groove Hunter",
@@ -50,10 +50,10 @@ export default async function RecordsPage({
   const searchTerm = q?.trim() ?? "";
   const precoMax   = precoMaxStr ? Number(precoMaxStr) : null;
 
-  let items: Awaited<ReturnType<typeof queryDiscos>>["items"] = [];
+  let items: Awaited<ReturnType<typeof cachedQueryDiscos>>["items"] = [];
   let total = 0, totalPages = 0;
   try {
-    ({ items, total, totalPages } = await queryDiscos({ searchTerm, sort, artist: artista, precoMax, page }));
+    ({ items, total, totalPages } = await cachedQueryDiscos({ searchTerm, sort, artist: artista, precoMax, page }));
   } catch {
     // DB unavailable — render empty state
   }

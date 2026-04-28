@@ -21,18 +21,12 @@ BROWSER_IDENTITIES = [
     "edge101", "firefox144", "firefox135", "firefox133",
 ]
 
-BASE_URL = "https://www.amazon.com.br"
+BASE_URL = "https://www.amazon.com"
 
 FAILING_ASINS = {
-    "B0DDCG82W5": "Come Over When You're Sober, Pt.1",
-    "B01N9UNDYP": "Fulfillingness' First Finale",
-    "B0C6R75J2H": "For Those That Wish To Exist At Abbey Road (Clear)",
-    "B09KL42T6J": "H to He Who Am the Only One",
-    "B00QR7ZMPS": "Grace Under Pressure",
-    "B09QPMLT8P": "(unknown title)",
-    "B0C4NWP4TK": "NOTHING ELSE MATTERS",
+    "B0DHJ5JDTM": "multi-format test ASIN",
 }
-REFERENCE_ASIN = {"B08CWG623F": "Merry Christmas (working reference)"}
+REFERENCE_ASIN = {"B09WVYGXFW": "single-format reference"}
 
 DEBUG_DIR = Path(__file__).parent.parent / "debug"
 DEBUG_DIR.mkdir(exist_ok=True)
@@ -43,8 +37,8 @@ def make_session():
         from curl_cffi import requests as cffi_requests
         s = cffi_requests.Session(impersonate=random.choice(BROWSER_IDENTITIES))
         s.headers.update({
-            "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8",
-            "Referer": "https://www.amazon.com.br/",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.amazon.com/",
         })
         print("[session] curl_cffi with browser impersonation")
         return s
@@ -53,8 +47,8 @@ def make_session():
         s = req_lib.Session()
         s.headers.update({
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
-            "Accept-Language": "pt-BR,pt;q=0.9",
-            "Referer": "https://www.amazon.com.br/",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.amazon.com/",
         })
         print("[session] fallback: requests (no browser impersonation)")
         return s
@@ -62,11 +56,11 @@ def make_session():
 
 def warm_up(session):
     try:
-        print("[warm-up] fetching amazon.com.br homepage...")
-        session.get("https://www.amazon.com.br/", timeout=15)
+        print("[warm-up] fetching amazon.com homepage...")
+        session.get("https://www.amazon.com/", timeout=15)
         time.sleep(random.uniform(1.0, 2.0))
         print("[warm-up] fetching vinyl category page...")
-        session.get("https://www.amazon.com.br/CD-e-Vinil/b/?node=7791937011", timeout=15)
+        session.get("https://www.amazon.com/s?i=popular&rh=n%3A5174&s=review-rank", timeout=15)
         time.sleep(random.uniform(0.5, 1.2))
         print("[warm-up] done.")
     except Exception as e:
@@ -108,18 +102,20 @@ BOT_SIGNALS = [
     "amazon.com.br/errors/validateCaptcha", "Prove you're not a robot",
 ]
 
-_VINYL_LABEL_RE = re.compile(r"vinil|vinyl", re.IGNORECASE)
-_INSTOCK_KW = ("em estoque", "in stock", "disponível", "disponivel")
-_OUTOFSTOCK_KW = ("atualmente indisponível", "currently unavailable",
-                  "fora de estoque", "out of stock", "não disponível", "not available")
-MIN_PRICE_BRL = 10.0
+_VINYL_LABEL_RE = re.compile(
+    r"vinil|vinyl|\blp\b|lp\s+record|lp\s+vinyl|\d+[\"']?\s*(?:inch|in\.?)\s+vinyl",
+    re.IGNORECASE,
+)
+_PRICE_CLEAN_US_RE = re.compile(r"[$,\xa0\s]")
+_INSTOCK_KW = ("in stock", "available")
+_OUTOFSTOCK_KW = ("currently unavailable", "out of stock", "not available")
+MIN_PRICE = 5.0
 
 
-def parse_price_br(text: str) -> float | None:
+def parse_price_us(text: str) -> float | None:
     if not text:
         return None
-    cleaned = re.sub(r"R\$\s*|\xa0|\s", "", text)
-    cleaned = cleaned.replace(".", "").replace(",", ".")
+    cleaned = _PRICE_CLEAN_US_RE.sub("", text)
     m = re.search(r"\d+\.?\d*", cleaned)
     return float(m.group()) if m else None
 
@@ -195,8 +191,8 @@ def diagnose(asin: str, html: str, http_status: int) -> dict:
             offscreen = row.select_one(".a-offscreen")
             price = None
             if offscreen:
-                price = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", ""))
-                if price and price < MIN_PRICE_BRL:
+                price = parse_price_us(offscreen.get_text(strip=True).replace("\xa0", ""))
+                if price and price < MIN_PRICE:
                     price = None
             result["format_rows"].append({"label": label[:120], "price": price})
             if _VINYL_LABEL_RE.search(label) and price:
@@ -207,7 +203,7 @@ def diagnose(asin: str, html: str, http_status: int) -> dict:
             for swatch in soup.select("#tmmSwatches .swatchElement"):
                 label = swatch.get_text(" ", strip=True)
                 offscreen = swatch.select_one(".a-offscreen")
-                price = parse_price_br(offscreen.get_text(strip=True).replace("\xa0", "")) if offscreen else None
+                price = parse_price_us(offscreen.get_text(strip=True).replace("\xa0", "")) if offscreen else None
                 result["format_rows"].append({"label": label[:120], "price": price})
                 if _VINYL_LABEL_RE.search(label) and price:
                     result["tmm_vinyl_price"] = price
@@ -237,7 +233,7 @@ def diagnose(asin: str, html: str, http_status: int) -> dict:
             whole = el.select_one(".a-price-whole")
             frac  = el.select_one(".a-price-fraction")
             if whole:
-                result["price_priceToPay"] = whole.get_text(strip=True) + "," + (frac.get_text(strip=True) if frac else "00")
+                result["price_priceToPay"] = whole.get_text(strip=True) + "." + (frac.get_text(strip=True) if frac else "00")
                 break
 
     # corePriceDisplay
@@ -254,9 +250,9 @@ def diagnose(asin: str, html: str, http_status: int) -> dict:
     # Generic .a-offscreen fallback (first matching price)
     for el in soup.select(".a-offscreen"):
         text = el.get_text(strip=True).replace("\xa0", "")
-        if text.startswith("R$") or re.match(r"^\d+[,.]", text):
-            p = parse_price_br(text)
-            if p and p >= MIN_PRICE_BRL:
+        if text.startswith("$") or re.match(r"^\d+[,.]", text):
+            p = parse_price_us(text)
+            if p and p >= MIN_PRICE:
                 result["price_offscreen_fallback"] = text
                 break
 
@@ -284,12 +280,12 @@ def diagnose(asin: str, html: str, http_status: int) -> dict:
     if result["tmm_vinyl_price"]:
         price = result["tmm_vinyl_price"]
     elif result["price_priceToPay"]:
-        price = parse_price_br(result["price_priceToPay"])
+        price = parse_price_us(result["price_priceToPay"])
     elif not result["has_format_switcher"] and result["price_offscreen_fallback"]:
-        price = parse_price_br(result["price_offscreen_fallback"])
+        price = parse_price_us(result["price_offscreen_fallback"])
 
-    if price and price >= MIN_PRICE_BRL:
-        result["predicted_outcome"] = f"updated (price extracted: R$ {price:.2f})"
+    if price and price >= MIN_PRICE:
+        result["predicted_outcome"] = f"updated (price extracted: $ {price:.2f})"
         result["root_cause"] = "SHOULD_WORK — price reachable"
     else:
         result["predicted_outcome"] = "deal_cleared (price=None after all selectors)"
@@ -309,7 +305,7 @@ def main():
     results = {}
 
     for asin, title in all_asins.items():
-        print(f"\n{'─'*60}")
+        print(f"\n{'-'*60}")
         print(f"ASIN: {asin}  —  {title}")
         html, status = fetch_and_save(session, asin)
         if html is None:
@@ -318,25 +314,25 @@ def main():
         results[asin] = diagnose(asin, html, status)
 
     # ── Print summary ─────────────────────────────────────────────────────────
-    print("\n\n" + "═"*80)
+    print("\n\n" + "="*80)
     print("DIAGNOSIS SUMMARY")
-    print("═"*80)
+    print("="*80)
 
     header = f"{'ASIN':<14} {'HTTP':>4}  {'Format?':>7}  {'VinylSel?':>9}  {'TMM$':>8}  {'ptpToPay':>12}  OUTCOME"
     print(header)
-    print("─"*80)
+    print("-"*80)
 
     for asin, r in results.items():
         label = (FAILING_ASINS | REFERENCE_ASIN).get(asin, "")[:30]
         fmt_sw = "YES" if r.get("has_format_switcher") else "no"
         vsel   = "YES" if r.get("selected_is_vinyl") else "NO"
-        tmm    = f"R${r['tmm_vinyl_price']:.2f}" if r.get("tmm_vinyl_price") else "—"
+        tmm    = f"${r['tmm_vinyl_price']:.2f}" if r.get("tmm_vinyl_price") else "—"
         ptp    = r.get("price_priceToPay") or "—"
         outcome = r.get("predicted_outcome", "?")
         print(f"{asin:<14} {r.get('http_status','?'):>4}  {fmt_sw:>7}  {vsel:>9}  {tmm:>8}  {ptp:>12}  {outcome}")
 
     print("\n\nDETAILED ROOT CAUSES")
-    print("─"*80)
+    print("-"*80)
     for asin, r in results.items():
         label = (FAILING_ASINS | REFERENCE_ASIN).get(asin, "")
         print(f"\n{asin} — {label}")

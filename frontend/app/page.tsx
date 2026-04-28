@@ -1,5 +1,5 @@
-import { queryDiscos } from "@/lib/queryDiscos";
-import { queryCarouselDiscos } from "@/lib/carousel";
+import { cachedQueryDiscos } from "@/lib/queryDiscos";
+import { cachedQueryCarouselDiscos } from "@/lib/carousel";
 import SortBar from "@/components/SortBar";
 import InfiniteGrid from "@/components/InfiniteGrid";
 import ArtistasCarousel from "@/components/ArtistasCarousel";
@@ -7,7 +7,7 @@ import BackToTop from "@/components/BackToTop";
 import Link from "next/link";
 import { Suspense } from "react";
 
-export const revalidate = 300;
+export const revalidate = 7200;
 
 export const metadata = {
   title: "The Groove Hunter — Best Deals on Vinyl Records",
@@ -52,12 +52,12 @@ export default async function HomePage({
   const searchTerm = q?.trim() ?? "";
   const precoMax   = precoMaxStr ? Number(precoMaxStr) : null;
 
-  let items: Awaited<ReturnType<typeof queryDiscos>>["items"] = [];
-  let total = 0, totalPages = 0, carouselItems: Awaited<ReturnType<typeof queryCarouselDiscos>> = [];
+  let items: Awaited<ReturnType<typeof cachedQueryDiscos>>["items"] = [];
+  let total = 0, totalPages = 0, carouselItems: Awaited<ReturnType<typeof cachedQueryCarouselDiscos>> = [];
   try {
     ([{ items, total, totalPages }, carouselItems] = await Promise.all([
-      queryDiscos({ searchTerm, sort, artist: artista, precoMax, page }),
-      searchTerm || artista ? Promise.resolve([]) : queryCarouselDiscos(),
+      cachedQueryDiscos({ searchTerm, sort, artist: artista, precoMax, page }),
+      searchTerm || artista ? Promise.resolve([]) : cachedQueryCarouselDiscos(),
     ]));
   } catch {
     // DB unavailable — render empty state
