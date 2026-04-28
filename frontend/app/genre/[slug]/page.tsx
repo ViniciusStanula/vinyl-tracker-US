@@ -15,6 +15,7 @@ type Sort = "discount" | "lowest-price" | "highest-price" | "top-rated" | "az";
 
 type SerializedStyleData = {
   canonical: string;
+  relatedGenres: { tag: string; slug: string }[];
   discos: {
     id: string;
     title: string;
@@ -55,6 +56,28 @@ const _getStylePageData = unstable_cache(
 
     if (canonicalRow.length === 0) return null;
     const canonical = canonicalRow[0].tag;
+
+    const relatedRows = await prisma.$queryRaw<{ tag: string; slug: string }[]>`
+      SELECT tag,
+        regexp_replace(
+          regexp_replace(
+            translate(lower(tag), ${ACCENT_FROM}, ${ACCENT_TO}),
+            '[^a-z0-9]+', '-', 'g'
+          ),
+          '^-+|-+$', '', 'g'
+        ) AS slug
+      FROM (
+        SELECT unnest(string_to_array(lastfm_tags, ', ')) AS tag
+        FROM "Record"
+        WHERE LOWER(${canonical}) = ANY(string_to_array(LOWER(lastfm_tags), ', '))
+          AND available = TRUE
+          AND lastfm_tags IS NOT NULL
+      ) t
+      WHERE lower(tag) != lower(${canonical})
+      GROUP BY tag
+      ORDER BY COUNT(*) DESC
+      LIMIT 20
+    `;
 
     const rows = await prisma.$queryRaw<{
       id: string;
@@ -129,6 +152,7 @@ const _getStylePageData = unstable_cache(
 
     return {
       canonical,
+      relatedGenres: relatedRows,
       discos: rows.map((row: (typeof rows)[number]) => {
         let sparkline: number[] = [];
         if (Array.isArray(row.sparkline)) {
@@ -237,7 +261,7 @@ export default async function StylePage({
   }
   if (!data) notFound();
 
-  const { canonical, discos } = data;
+  const { canonical, relatedGenres, discos } = data;
   const displayName = canonical.replace(/\b\w/g, (c) => c.toUpperCase());
 
   const DEAL_STALE_MS = 4 * 60 * 60 * 1000;
@@ -351,6 +375,25 @@ export default async function StylePage({
           </p>
           <p className="text-dust text-sm">Try adjusting the filters.</p>
         </div>
+      )}
+
+      {relatedGenres.length > 0 && (
+        <section className="mt-12 pt-8 border-t border-groove">
+          <h2 className="text-xs font-bold tracking-widest text-dust uppercase mb-4">
+            Related Genres
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {relatedGenres.map(({ tag, slug: relSlug }) => (
+              <Link
+                key={relSlug}
+                href={`/genre/${relSlug}`}
+                className="px-3 py-1.5 rounded-full bg-groove border border-wax/40 text-parchment text-sm hover:border-gold hover:text-cream transition-colors"
+              >
+                {tag.replace(/\b\w/g, (c) => c.toUpperCase())}
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       <BackToTop />
