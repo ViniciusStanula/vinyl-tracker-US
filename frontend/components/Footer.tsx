@@ -50,7 +50,7 @@ export default function Footer() {
 
       <div className="border-t border-groove/50 px-4 py-4 text-center text-xs text-dust">
         <p>
-          As an Amazon Associate we earn from qualifying purchases. Prices shown are from Amazon and may vary.{" "}
+          As an Amazon Associate we earn from qualifying purchases at no extra cost to you. Prices are from Amazon and may vary.{" "}
           <Link href="/about" className="hover:text-parchment transition-colors underline underline-offset-2">
             Learn more
           </Link>
