@@ -12,12 +12,12 @@ export const revalidate = 7200;
 export const metadata = {
   title: "The Groove Hunter — Best Deals on Vinyl Records",
   description:
-    "Track vinyl record prices on Amazon. Full price history updated twice daily.",
+    "Track vinyl record prices on Amazon. Full price history updated every 3 hours.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "The Groove Hunter — Best Deals on Vinyl Records",
     description:
-      "Track vinyl record prices on Amazon. Full price history updated twice daily.",
+      "Track vinyl record prices on Amazon. Full price history updated every 3 hours.",
     url: "/",
     type: "website",
     images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "The Groove Hunter" }],
@@ -26,7 +26,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "The Groove Hunter — Best Deals on Vinyl Records",
     description:
-      "Track vinyl record prices on Amazon. Full price history updated twice daily.",
+      "Track vinyl record prices on Amazon. Full price history updated every 3 hours.",
     images: ["/og-default.png"],
   },
 };

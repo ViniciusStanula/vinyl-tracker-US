@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="col-span-2 sm:col-span-2">
           <p className="font-display font-bold text-cream mb-1 text-base">The Groove Hunter</p>
           <p className="text-dust text-xs leading-relaxed max-w-xs">
-            Tracks vinyl record prices on Amazon twice daily. Full price history and automatic deal detection.
+            Tracks vinyl record prices on Amazon every 3 hours. Full price history and automatic deal detection.
           </p>
           <div className="mt-4 flex flex-col gap-1">
             <Link href="/"        className="text-dust hover:text-cream transition-colors">Home</Link>
