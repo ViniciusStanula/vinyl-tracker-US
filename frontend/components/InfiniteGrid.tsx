@@ -8,7 +8,7 @@ import type { ProcessedDisco } from "@/lib/queryDiscos";
 type SearchParams = {
   q?: string;
   sort?: string;
-  artista?: string;
+  artist?: string;
   precoMax?: string;
 };
 
@@ -69,7 +69,7 @@ export default function InfiniteGrid({
     if (searchParams.q) params.set("q", searchParams.q);
     if (searchParams.sort && searchParams.sort !== "discount")
       params.set("sort", searchParams.sort);
-    if (searchParams.artista) params.set("artista", searchParams.artista);
+    if (searchParams.artist) params.set("artist", searchParams.artist);
     if (searchParams.precoMax) params.set("precoMax", searchParams.precoMax);
     params.set("page", String(nextPage));
 

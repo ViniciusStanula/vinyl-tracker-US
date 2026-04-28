@@ -60,9 +60,11 @@ function Sparkline({ values }: { values: number[] }) {
 export default function DiscoCard({
   disco,
   priority = false,
+  headingLevel = "h2",
 }: {
   disco: DiscoCardProps;
   priority?: boolean;
+  headingLevel?: "h2" | "h3";
 }) {
   const fmt = (v: number) =>
     v.toLocaleString("en-US", {
@@ -77,6 +79,7 @@ export default function DiscoCard({
   const confidenceLevel    = disco.confidenceLevel ?? null;
   const artistSlug         = slugifyArtist(disco.artist);
   const sparkline          = disco.sparkline ?? [];
+  const H                  = headingLevel;
 
   // Score-3 gets a subtle gold ring
   const cardRing = dealScore === 3 ? " ring-1 ring-gold/40" : "";
@@ -159,12 +162,12 @@ export default function DiscoCard({
         </Link>
 
         {/* Title — Fraunces for editorial character */}
-        <h2
+        <H
           className="font-display text-cream text-sm font-semibold leading-snug line-clamp-2 min-h-[2.5rem] mt-0.5"
           title={disco.title}
         >
           {disco.title}
-        </h2>
+        </H>
 
         {/* ── Price section ──────────────────────────────────────── */}
         <div className="mt-auto pt-2">

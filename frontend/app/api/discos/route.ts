@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const q           = (sp.get("q") ?? "").slice(0, 200);
   const sortRaw     = sp.get("sort") ?? "discount";
   const sort        = ALLOWED_SORTS.has(sortRaw) ? sortRaw : "discount";
-  const artista     = sp.get("artista") || undefined;
+  const artist     = sp.get("artist") || undefined;
   const page        = Math.max(1, parseInt(sp.get("page") ?? "1", 10));
   const precoMaxStr = sp.get("precoMax");
   const precoMax    = precoMaxStr ? Number(precoMaxStr) : null;
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const { items, total, totalPages } = await cachedQueryDiscos({
       searchTerm: q.trim(),
       sort,
-      artist: artista,
+      artist: artist,
       precoMax,
       page,
     });

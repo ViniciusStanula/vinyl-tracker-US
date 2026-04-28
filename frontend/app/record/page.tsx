@@ -18,12 +18,14 @@ export const metadata = {
       "All vinyl records on sale on Amazon. Filter by price, artist, and sort order.",
     url: "/record",
     type: "website",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "The Groove Hunter" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "All Records — The Groove Hunter",
     description:
       "All vinyl records on sale on Amazon. Filter by price, artist, and sort order.",
+    images: ["/og-default.png"],
   },
 };
 
@@ -33,7 +35,7 @@ export default async function RecordsPage({
   searchParams: Promise<{
     q?: string;
     sort?: string;
-    artista?: string;
+    artist?: string;
     page?: string;
     precoMax?: string;
   }>;
@@ -41,7 +43,7 @@ export default async function RecordsPage({
   const {
     q,
     sort = "discount",
-    artista,
+    artist,
     page: pageStr,
     precoMax: precoMaxStr,
   } = await searchParams;
@@ -53,7 +55,7 @@ export default async function RecordsPage({
   let items: Awaited<ReturnType<typeof cachedQueryDiscos>>["items"] = [];
   let total = 0, totalPages = 0;
   try {
-    ({ items, total, totalPages } = await cachedQueryDiscos({ searchTerm, sort, artist: artista, precoMax, page }));
+    ({ items, total, totalPages } = await cachedQueryDiscos({ searchTerm, sort, artist: artist, precoMax, page }));
   } catch {
     // DB unavailable — render empty state
   }
@@ -62,6 +64,7 @@ export default async function RecordsPage({
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="sr-only">All Vinyl Records — The Groove Hunter</h1>
 
       <div className="mb-5">
         <Suspense>
@@ -81,9 +84,9 @@ export default async function RecordsPage({
             </span>
           )}
         </p>
-        {artista && (
+        {artist && (
           <span className="inline-flex items-center gap-1.5 bg-groove border border-wax/60 text-parchment text-xs px-3 py-1 rounded-full">
-            {artista}
+            {artist}
             <Link
               href="/record"
               className="text-dust hover:text-cream transition-colors leading-none"
@@ -100,8 +103,8 @@ export default async function RecordsPage({
           initialItems={items}
           currentPage={currentPage}
           totalPages={totalPages}
-          searchParams={{ q, sort, artista, precoMax: precoMaxStr }}
-          animationKey={`${sort}-${q ?? ""}-${artista ?? ""}-${currentPage}`}
+          searchParams={{ q, sort, artist, precoMax: precoMaxStr }}
+          animationKey={`${sort}-${q ?? ""}-${artist ?? ""}-${currentPage}`}
         />
       ) : (
         <div className="text-center py-24 text-dust">

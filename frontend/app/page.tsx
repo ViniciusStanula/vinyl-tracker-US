@@ -20,12 +20,14 @@ export const metadata = {
       "Track vinyl record prices on Amazon. Full price history updated twice daily.",
     url: "/",
     type: "website",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "The Groove Hunter" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "The Groove Hunter — Best Deals on Vinyl Records",
     description:
       "Track vinyl record prices on Amazon. Full price history updated twice daily.",
+    images: ["/og-default.png"],
   },
 };
 
@@ -35,7 +37,7 @@ export default async function HomePage({
   searchParams: Promise<{
     q?: string;
     sort?: string;
-    artista?: string;
+    artist?: string;
     page?: string;
     precoMax?: string;
   }>;
@@ -43,7 +45,7 @@ export default async function HomePage({
   const {
     q,
     sort = "discount",
-    artista,
+    artist,
     page: pageStr,
     precoMax: precoMaxStr,
   } = await searchParams;
@@ -56,8 +58,8 @@ export default async function HomePage({
   let total = 0, totalPages = 0, carouselItems: Awaited<ReturnType<typeof cachedQueryCarouselDiscos>> = [];
   try {
     ([{ items, total, totalPages }, carouselItems] = await Promise.all([
-      cachedQueryDiscos({ searchTerm, sort, artist: artista, precoMax, page }),
-      searchTerm || artista ? Promise.resolve([]) : cachedQueryCarouselDiscos(),
+      cachedQueryDiscos({ searchTerm, sort, artist: artist, precoMax, page }),
+      searchTerm || artist ? Promise.resolve([]) : cachedQueryCarouselDiscos(),
     ]));
   } catch {
     // DB unavailable — render empty state
@@ -103,9 +105,9 @@ export default async function HomePage({
             </span>
           )}
         </p>
-        {artista && (
+        {artist && (
           <span className="inline-flex items-center gap-1.5 bg-groove border border-wax/60 text-parchment text-xs px-3 py-1 rounded-full">
-            {artista}
+            {artist}
             <Link
               href="/"
               className="text-dust hover:text-cream transition-colors leading-none"
@@ -123,8 +125,8 @@ export default async function HomePage({
           initialItems={items}
           currentPage={currentPage}
           totalPages={totalPages}
-          searchParams={{ q, sort, artista, precoMax: precoMaxStr }}
-          animationKey={`${sort}-${q ?? ""}-${artista ?? ""}-${currentPage}`}
+          searchParams={{ q, sort, artist, precoMax: precoMaxStr }}
+          animationKey={`${sort}-${q ?? ""}-${artist ?? ""}-${currentPage}`}
           basePath="/record"
         />
       ) : (

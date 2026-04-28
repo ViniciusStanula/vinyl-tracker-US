@@ -1,6 +1,13 @@
 const TITLE_LIMIT = 60;
 const DESC_LIMIT  = 155;
 
+export const SITE_URL = (() => {
+  const v = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!v && process.env.NODE_ENV === "production")
+    throw new Error("NEXT_PUBLIC_SITE_URL must be set in production");
+  return v ?? "http://localhost:3000";
+})();
+
 /**
  * If title exceeds Google's display limit, drop the suffix after the last " | ".
  * Falls back to a hard slice if no pipe separator exists.

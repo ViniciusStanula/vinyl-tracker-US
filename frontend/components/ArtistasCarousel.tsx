@@ -61,11 +61,13 @@ export default function ArtistasCarousel({ items }: { items: ProcessedDisco[] })
 
       <div
         ref={ref}
+        role="list"
+        aria-label="Most listened artists carousel"
         className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2"
       >
         {items.map((disco, i) => (
-          <div key={disco.id} className="snap-start shrink-0 w-44 sm:w-52">
-            <DiscoCard disco={disco} priority={i < 6} />
+          <div key={disco.id} role="listitem" className="snap-start shrink-0 w-44 sm:w-52">
+            <DiscoCard disco={disco} priority={i < 6} headingLevel="h3" />
           </div>
         ))}
       </div>

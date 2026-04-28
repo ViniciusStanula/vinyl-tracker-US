@@ -13,10 +13,10 @@ export default function SearchBar() {
   function navigate(value: string) {
     const params = new URLSearchParams();
     const sort    = searchParams.get("sort");
-    const artista = searchParams.get("artista");
+    const artist = searchParams.get("artist");
     const precoMax = searchParams.get("precoMax");
     if (sort)     params.set("sort", sort);
-    if (artista)  params.set("artista", artista);
+    if (artist)  params.set("artist", artist);
     if (precoMax) params.set("precoMax", precoMax);
     if (value)    params.set("q", value);
     startTransition(() => {

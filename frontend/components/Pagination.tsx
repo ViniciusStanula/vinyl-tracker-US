@@ -3,7 +3,7 @@ import Link from "next/link";
 type SearchParams = {
   q?: string;
   sort?: string;
-  artista?: string;
+  artist?: string;
   precoMax?: string;
 };
 
@@ -11,7 +11,7 @@ function buildUrl(page: number, sp: SearchParams, basePath: string): string {
   const params = new URLSearchParams();
   if (sp.q) params.set("q", sp.q);
   if (sp.sort && sp.sort !== "desconto") params.set("sort", sp.sort);
-  if (sp.artista) params.set("artista", sp.artista);
+  if (sp.artist) params.set("artist", sp.artist);
   if (sp.precoMax) params.set("precoMax", sp.precoMax);
   if (page > 1) params.set("page", String(page));
   const qs = params.toString();

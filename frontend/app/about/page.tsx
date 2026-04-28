@@ -46,18 +46,31 @@ export const metadata = {
       "How The Groove Hunter works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
     url: "/about",
     type: "website",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "The Groove Hunter" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "About — The Groove Hunter",
     description:
       "How The Groove Hunter works: vinyl record price monitoring on Amazon, full price history, and automatic deal detection.",
+    images: ["/og-default.png"],
   },
 };
+
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",  item: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/` },
+    { "@type": "ListItem", position: 2, name: "About", item: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/about` },
+  ],
+});
 
 export default function AboutPage() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
 
       {/* ── Breadcrumbs ─────────────────────────────────────────── */}
       <nav className="mb-6 text-sm text-dust flex gap-2">

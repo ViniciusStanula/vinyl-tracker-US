@@ -45,13 +45,16 @@ export async function generateMetadata({
         title,
         description,
         url: `/record/${slug}`,
-        type: "website",
-        ...(disco.imgUrl ? { images: [{ url: disco.imgUrl, alt: disco.title }] } : {}),
+        type: "music.album",
+        images: disco.imgUrl
+          ? [{ url: disco.imgUrl, width: 500, height: 500, alt: `${disco.title} by ${disco.artist}` }]
+          : [{ url: "/og-default.png", width: 1200, height: 630, alt: "The Groove Hunter" }],
       },
       twitter: {
-        card: disco.imgUrl ? "summary_large_image" : "summary",
+        card: "summary_large_image",
         title,
         description,
+        images: [disco.imgUrl ?? "/og-default.png"],
       },
     };
   } catch {
@@ -252,7 +255,7 @@ export default async function RecordPage({
     "@type": "Product",
     name: disco.title,
     image: disco.imgUrl ?? undefined,
-    brand: { "@type": "Brand", name: disco.artist },
+    brand: { "@type": "MusicGroup", name: disco.artist },
     offers: {
       "@type": "Offer",
       url: disco.url,
@@ -276,6 +279,18 @@ export default async function RecordPage({
       : {}),
   });
 
+  const musicAlbumJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "MusicAlbum",
+    name: disco.title,
+    byArtist: {
+      "@type": "MusicGroup",
+      name: disco.artist,
+      url: `${siteUrl}/artist/${slugifyArtist(disco.artist)}`,
+    },
+    ...(disco.imgUrl ? { image: disco.imgUrl } : {}),
+  });
+
   const breadcrumbJsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -295,6 +310,8 @@ export default async function RecordPage({
     <main className="max-w-3xl mx-auto px-4 py-8">
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: productJsonLd }} />
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: musicAlbumJsonLd }} />
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
       <nav className="flex items-center gap-1.5 text-sm text-dust mb-6 flex-wrap">
