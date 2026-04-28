@@ -387,7 +387,7 @@ export default async function StylePage({
               <Link
                 key={relSlug}
                 href={`/genre/${relSlug}`}
-                className="px-3 py-1.5 rounded-full bg-groove border border-wax/40 text-parchment text-sm hover:border-gold hover:text-cream transition-colors"
+                className="px-3 py-1 rounded-full bg-groove border border-wax/60 text-parchment text-xs hover:border-gold hover:text-cream transition-colors"
               >
                 {tag.replace(/\b\w/g, (c) => c.toUpperCase())}
               </Link>
